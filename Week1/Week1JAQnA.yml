@@ -1,0 +1,112 @@
+Questions :
+----------
+
+1. What is the difference between == and === in JavScript ?
+
+2."In JavaScript, strings are immutable. What does that actually mean when we say we are 'modifying' a string"
+
+3.You have a dynamic string: 'Order ID: #12345-Confirmed'. Write a quick logic using String methods (slice, split, or substring) to extract just the ID 12345
+
+4."I have a string let str = 'Hello World'. I want to change the 'H' to 'J'.
+If I write str[0] = 'J';, what happens?
+Question: How does JavaScript handle string storage in memory? Since strings are immutable, how do we actually 'modify' them in our code?"
+
+5."Take a sentence: 'Automation testing is very important'.
+Task: Write a loop that finds and returns the longest word in that sentence."
+
+Home Assignment :
+-----------------
+
+6."You have a continuous string of server logs:
+ERROR: 404 [Time: 12:00] | INFO: Login Success [Time: 12:01] | ERROR: 500 [Time: 12:05]
+Question: I need an array containing only the timestamps where an ERROR occurred. How would you approach this? (Split by pipe |, loop through, check for 'ERROR', extract substring)."
+
+7. When would you use replaceAll() in test Automation?
+
+8.remove duplicates from a string
+
+Task: Remove duplicate characters from a string.
+Solution: Use a loop to check if a character already exists in a "results" array.
+
+let word = "programming";
+
+=======================================================================================================================================
+
+Q1. What is the difference between == and === in JavScript ?
+
+1. Double Equals (==) – Loose Equality
+
+Compares only values, not types.
+If types differ, JavaScript does type coercion (tries to convert them before comparing).
+
+Ex:
+
+console.log(5 == "5");   // true  (string "5" → number 5)// converts string 5 into number and then compares).
+console.log(0 == false); // true  (false → 0)
+console.log(null == undefined); // true  (special case)
+
+2. Triple Equals (===) – Strict Equality
+
+Compares both value and type.
+No type coercion happens.
+
+Ex:
+
+console.log(5 === "5");   // false (number vs string)
+console.log(0 === false); // false (number vs boolean)
+console.log(null === undefined); // false (different types)
+
+-------------------------------------------------------------------------------------------------------------
+
+2. String Immutability & Memory
+Question: Strings are immutable. What does "modifying" a string actually mean?
+Answer: Immutability means the data inside a string cannot be changed once created.
+The Reality: When you "modify" a string, JavaScript creates a new string in a new memory location.
+The Reference: The variable name simply stops pointing to the old memory address and starts pointing to the new one.
+
+let str = "test"; // Points to memory location A
+str = str + "leaf"; // Creates "testleaf" in location B; str now points to B
+
+-------------------------------------------------------------------------------------------------------------
+
+3. Extracting Data with split()
+Task: Extract 12345 from 'Order ID: #12345-Confirmed'.
+Solution: Use split() to break the string at specific delimiters.
+
+let productDetails = "Order ID: #12345-Confirmed";
+let prod_status = productDetails.split("#"); // ["Order ID: ", "12345-Confirmed"]
+let prod_id = prod_status[1].split('-');    // ["12345", "Confirmed"]
+
+console.log(prod_id[0]); // Output: 12345
+
+-------------------------------------------------------------------------------------------------------------
+
+4. Correcting Characters in a String
+Question: Does str[0] = 'J' work?
+Answer: No. Because strings are immutable, bracket notation is read-only. To change a character, you must reconstruct the string.
+
+let str = 'Hello World';
+str[0] = 'J'; // Silently fails; str is still 'Hello World'
+
+// Correct Approach:
+str = 'J' + str.slice(1); 
+console.log(str); // 'Jello World'
+
+-------------------------------------------------------------------------------------------------------------
+5. Logic: Finding the Longest Word
+Task: Identify the longest word in a sentence.
+Solution: Loop through an array of words and track the maximum length found.
+
+let str = 'Automation testing is very important';
+let words = str.split(" ");
+let longest = "";
+
+for (let i = 0; i < words.length; i++) {
+    if (words[i].length > longest.length) {
+        longest = words[i];
+    }
+}
+console.log(longest); // "incredibly"
+
+-------------------------------------------------------------------------------------------------------------
+
