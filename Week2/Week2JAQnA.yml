@@ -1,0 +1,183 @@
+
+Previous Week : Week 1 : QnA Discussion
+
+
+6."You have a continuous string of server logs:
+ERROR: 404 [Time: 12:00] | INFO: Login Success [Time: 12:01] | ERROR: 500 [Time: 12:05]
+
+["ERROR: 404 [Time: 12:00]" , "INFO: Login Success [Time: 12:01]" , "ERROR: 500 [Time: 12:05]"]
+
+["ERROR: 404 [Time: 12:00]" , "ERROR: 500 [Time: 12:05]"]
+
+Question: I need an array containing only the timestamps where an ERROR occurred. How would you approach this? (Split by pipe |, loop through, check for 'ERROR', extract substring)."
+
+7. When would you use replaceAll() in test Automation?
+
+8.remove duplicates from a string
+
+Task: Remove duplicate characters from a string.
+Solution: Use a loop to check if a character already exists in a "results" array.
+
+let word = "programming";
+
+
+Week2 : QnA Discussion Arrays Topic :
+-------------------------------------
+
+1, Array map, filter and sort methods?
+
+Question: How would you sort an array of objects by a specific property in JavaScript?
+Answer: You can use the `Array.prototype.sort()` method along with a custom comparator function. For example, to sort an array of objects by the 'name' property:
+
+
+2, Playwright Specific Questions 
+
+**1.Why does Playwright not suffer from the "Stale Element Exception" common in Selenium?**
+
+Answer: This is due to Playwright's auto-waiting and actionability checks. 
+Before performing an action, Playwright checks if the element is attached, visible, stable (not animating), and "hit-targetable" (not covered by another element). 
+If the element shifts or re-renders, Playwright automatically retries the check until it passes or times out.
+
+**2.A test fails only in CI but passes locally. What is your first step to debug it?**
+
+Answer: Enable Playwright Tracing. Traces capture a "screencast" of the test, network logs, and DOM snapshots at every action, allowing you to visually replay exactly what happened in the CI environment
+
+
+
+**3.What is the difference between a function login() {} and const login = function() {}? Specifically, how does hoisting affect them in a test script?**
+
+Answer: Function Declarations are hoisted, meaning you can call the function before it is defined in your code. 
+Function Expressions are not hoisted; if you try to call them before the line of definition, you will get a ReferenceError.
+
+**4."Write a reusable JavaScript function that takes a Playwright 'locator' as an input and returns 'true' if the element is both visible and enabled, otherwise returns 'false'.** 
+
+async function isReady(locator) {
+
+if(true){
+
+ return await locator.isVisible() \&\& await locator.isEnabled(); // true if the web element is isVisible and isEnabled
+
+} 
+
+return false;
+}
+
+
+login.spec.ts
+
+
+isReady("#username") / calling a named function and passing the locator as an argument 
+
+await page.locator("#username").fill("demosalesmanager");
+
+isReady("#password") 
+
+await page.locator("#password").fill("democsr");
+
+isReady(".decorativeSubmit") 
+
+await page.locator(".decorativeSubmit").click();
+
+-----------------------
+
+
+Q5. What mechanism does Playwright use to interact with the browser?”
+
+Playwright communicates with browsers using the Chrome DevTools Protocol (CDP) over WebSocket, allowing direct control of browser actions.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q6. What is Chrome Dev Protocol?
+
+CDP is a low-level protocol used by tools (like Playwright, Puppeteer) to control, inspect, and debug Chromium-based browsers.
+It allows direct access to browser internals like **DOM**, **network**, **console**, etc.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q7. what are the Browser Installation commands in PW.
+
+* Install Playwright with browsers:*
+  npx playwright install
+* This installs Chromium, Firefox, and WebKit browsers.
+
+* To install Playwright package:
+  npm install -D @playwright/test
+
+* To Execute Playwright code
+  npx playwright test filename.spec.ts
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q8. what are the different browsers supported by Playwright.
+
+"Playwright supports all major browser engines: Chromium (Chrome, Edge, Opera, Brave, etc.), WebKit (Safari), and Firefox. This ensures true cross-browser testing with a single API.”
+ Playwright is cross-browser and supports all modern rendering engines.
+
+🔹 1. Chromium-based Browsers
+
+ Google Chrome
+ Microsoft Edge
+
+Any Chromium-based browser (Brave, Vivaldi, Opera, etc.)
+
+🔹 2. WebKit
+
+Safari (Playwright runs Safari’s engine through WebKit)
+
+🔹 3. Firefox
+
+Supports Mozilla Firefox
+
+It allows **cross-browser testing** with a single codebase.
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Q9. explain about chromium browser.
+
+Chromium is an open-source browser project by Google, which is the base for Chrome, Edge, Opera, Brave, and others. It uses the Blink engine and V8 JavaScript engine, making it fast and reliable. Playwright uses Chromium for automation because it’s lightweight, open, and widely compatible.”
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q10.  What is test function in playwright 
+
+The `test()` function is provided by the `@playwright/test` module is a test runner.
+It defines a **test case**.
+
+
+test('verify login', async ({ page }) => {
+  await page.goto('https://example.com');
+});
+
+Used with fixtures like `page`, `browser`, etc.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+Q11. Explain about async/await?
+
+`async/await` is a cleaner way to handle Promises in JavaScript.
+
+* `async` keyword defines a function that returns a Promise.
+* `await` pauses execution until the Promise is resolved or rejected.
+
+
+async function getData() {
+  const response = await fetch(url);
+  console.log(response);
+}
+
+Makes asynchronous code look and behave like synchronous code.
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Q12. How does Playwright handle auto-waiting and retries?
+
+Playwright auto-waits for elements to become visible, enabled, and attached to the DOM.
+
+It also retries failed steps (like click or fill) until timeout is hit, reducing flakiness.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q13. What is the role of Browser, Context, and Page in Playwright?
+ 
+
+Browser: Actual browser engine (Chromium, Firefox, WebKit)
+
+Context: Isolated environment like an incognito session
+
+Page: A single tab within a context
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
