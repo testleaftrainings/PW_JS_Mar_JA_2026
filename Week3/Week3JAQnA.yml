@@ -1,0 +1,163 @@
+
+Week3JA Question and Answer
+----
+
+**1. How do you handle a dropdown that doesn't use the standard <select> tag but is built with a <div> or <ul> (custom dropdown)?**
+
+Answer: You cannot use selectOption() for these. Instead, you must:
+
+Click the dropdown to expand the list.
+
+Wait for the list items (li or div) to become visible.
+
+Click the specific item using a text-based locator like page.getByRole('listitem').filter({ hasText: 'Option Name' }).
+
+
+
+**2.Your dropdown options load only after you type 3 characters in an input field. How do you automate this?**
+
+Answer:
+
+Use locator.pressSequentially() with a delay to simulate real typing.
+
+
+
+**3.A test fails only in CI but passes locally. What is your first step to debug it?**
+
+Answer: Enable Playwright Tracing. Traces capture a "screencast" of the test, network logs, and DOM snapshots at every action, allowing you to visually replay exactly what happened in the CI environment
+
+
+
+**4. The "Infinite Scroll" Dropdown**
+
+Question: A dropdown only loads the next 10 items when you scroll to the bottom. How do you select the 50th item?
+
+Answer:
+
+Click to open the dropdown.
+
+Use a while loop to check if the target item is visible.
+
+If not, use page.keyboard.press('PageDown') or locator.scrollIntoViewIfNeeded() on the last visible item.
+
+
+**5.: How do you select multiple options in a standard <select multiple> element?**
+
+Answer: Pass an array to .selectOption().
+
+Example: await page.locator('#colors').selectOption(\['Red', 'Green', 'Blue']);
+
+
+**6.Question: How would you write a loop to handle this efficiently without the test failing because the menu disappeared?**
+
+Answer: You must re-click the dropdown trigger inside the loop for every iteration.
+
+const itemsToSelect = \['Apple', 'Orange', 'Banana'];
+
+for (const item of itemsToSelect) {
+
+ await page.click('#dropdown-trigger'); // Re-open
+
+ await page.getByRole('option', { name: item }).click();
+
+}
+
+
+7. Question: 1. Stabilizing Locators (Strict Mode Violation)
+Problem: page.locator('button') is too generic. If a "Loading Spinner" also uses a <button> tag, Playwright detects two elements and throws a Strict Mode Violation error.
+
+Solution:
+
+Use Semantic Locators: Use getByRole with the name option. This filters out buttons that do not have the specific accessible text "Submit".
+
+State Guiding: Ensure the spinner is gone before interacting. Playwright's auto-waiting handles visibility, but if the spinner is a separate button that disappears, checking its state first prevents the collision.
+
+Code Example:
+
+const spinner = page.locator('.loading-spinner');
+await expect(spinner).toBeHidden(); 
+await page.getByRole('button', { name: 'Submit', exact: true }).click();
+
+
+8. Relative XPath for Dynamic Tables
+Logic: When IDs are dynamic, use a unique text anchor (like a Username) to find the row, then navigate to the button within that row.
+
+XPath Options:
+
+Following-Sibling: //td[text()='John Doe']/following-sibling::td/button[@class='btn-edit']
+(Navigates from the name cell to the adjacent actions cell).
+
+Child to Parent (Ancestor): //tr[td[text()='John Doe']]//button[@class='btn-edit']
+(Finds the table row containing "John Doe" and searches for the Edit button anywhere inside that specific row).
+
+
+9. Modal Disappearance & Timeouts
+Problem: Default timeout is 5s, but the process takes 6s.
+Solution:
+
+Action: Do not increase the global timeout, as this slows down the entire suite's failure reporting.
+
+Local Override: Pass a specific timeout to the web-first assertion.
+ expect(page.locator('#modal')).toBeHidden({timeout:6000});
+Note: This passes immediately once the modal disappears (at 6s), rather than waiting for the full 10s.
+
+10. Broken Link Scraper
+test('scraping link from page',async({page})=>{
+
+
+    await page.goto('https://www.facebook.com/')
+    const address=await page.locator('a').all()
+    
+    for(let i=0;i<address.length;i++)
+    {
+        let link=await address[i].getAttribute('href')
+        if(!link?.startsWith('https')) console.log(link);
+          
+        
+    }
+})
+
+Explanation
+This is a Playwright test that collects all links (<a> tags) from a webpage and filters them.
+page.goto() → Opens the given website.
+page.locator('a').all() → Finds all anchor elements (links) on the page and stores them as a list.
+Loop → Iterates through each link element.
+getAttribute('href') → Extracts the URL from each link.
+!link?.startsWith('https') → Checks if the link is NOT a secure (https) link.
+If condition is true → Logs those links (like broken, relative, or empty links).
+
+Problem it solves:
+
+Helps identify invalid links, relative paths, or potentially broken links during automation testing.
+---
+
+11. Compound XPath (AND Logic)
+Logic: Use the and keyword within square brackets to verify multiple attributes on a single element.
+XPath: //input[@class='form-control' and @title='Username']
+
+12.Relative XPath for Dynamic Tables
+
+https://leafground.com/table.xhtml
+
+
+(//table[@role='grid'])[2]//tr/td[1]
+
+
+12. Static vs. Web-First URL Assertions
+test('assertion timeout override',async({page})=>{
+
+    expect(page.locator('#username')).toBeHidden({timeout:6000});
+   
+   
+    const url=page.url()
+    page.click('#login')
+   expect(url).toBe('http://leaftaps.com/crmsfa/control/main') //=>non retry assertion
+   await expect(page).toHaveURL('http://leaftaps.com/crmsfa/control/main',{timeout:6000}) //=>retrying assertion
+
+})
+
+13. Backward Traversal (Preceding Axis)
+Logic: The preceding axis searches for all elements located before the current element in the entire document. Using index [1] selects the closest match moving backward.
+
+XPath:
+//button[text()='Save']/preceding::span[@class='error'][1]

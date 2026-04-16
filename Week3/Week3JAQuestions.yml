@@ -1,0 +1,70 @@
+
+Week2JAQuestions:
+-----------------------------
+
+**1. How do you handle a dropdown that doesn't use the standard <select> tag but is built with a <div> or <ul> (custom dropdown)?**
+
+**2. What are dropdowns and how do we handle it in playwright?
+
+
+**3.Your dropdown options load only after you type 3 characters in an input field. How do you automate this?**
+
+await page.locator.pressSquentially("abc") with a a delay to type the characters one by one, or use page.fill("abc") to type the entire string at once.
+
+// Type "abc" into the input field to trigger the dropdown options to load
+
+
+**4.A test fails only in CI but passes locally. What is your first step to debug it?**
+
+
+**5. The "Infinite Scroll" Dropdown**
+Question: A dropdown only loads the next 10 items when you scroll to the bottom. How do you select the 50th item?
+
+OPtion 1: Use a while() loop to scroll down until the 50th item is loaded, then select it.
+
+Option2 : Use await page.keyboard.press('PageDown') in a loop to scroll down until the 50th item is visible, then select it.
+
+**6.: How do you select multiple options in a standard <select multiple> element?**
+
+Pass an array of values to the selectOption method, like this: 
+
+
+✔ Option 1: Using values
+
+await page.selectOption('#my-multi-select', ['aws', 'azure']);
+
+✔ Option 2: Using labels
+
+await page.selectOption('#my-multi-select', [
+  { label: 'AWS' },
+  { label: 'Azure' }
+]);
+
+✔ Option 3: Using values + labels mix
+await page.selectOption('#my-multi-select', [
+  { value: 'aws' },
+  { label: 'Azure' }
+]);
+
+In Playwright, to select multiple options in a <select multiple> dropdown, we pass an array of values or option objects (label/value) directly to selectOption().
+
+**7.Question: How would you write a loop to handle this efficiently without the test failing because the menu disappeared?**
+
+**8. Question: 1. Stabilizing Locators (Strict Mode Violation)
+Problem: page.locator('button') is too generic. If a "Loading Spinner" also uses a <button> tag, Playwright detects two elements and throws a Strict Mode Violation error.
+
+**9. Modal Disappearance & Timeouts**
+Problem: Default timeout is 5s, but the process takes 6s.
+
+expect(page.locator("#modal")).toBeVisible()//default timeout : 5000 ms
+expect(page.locator("#modal")).toBeVisible({timeout:8000})// timeout : 8000 ms
+
+10. Broken Link Scraper
+
+11. Compound XPath (AND Logic)
+Logic: Use the "and" keyword within square brackets to verify multiple attributes on a single element.
+
+12. Relative XPath for Dynamic Tables
+
+https://leafground.com/table.xhtml
+
