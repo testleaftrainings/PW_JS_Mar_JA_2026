@@ -1,0 +1,108 @@
+
+
+Week4 Questions
+===========
+
+Q1. How does TypeScript determine the data type of a variable when type is not mentioned?
+
+let city = "Chennai"; // implicitly typed as string
+
+explictily typed:
+let city: string = "Chennai"; // explicitly typed as string
+
+-------
+
+Q2. How does datatype `any` differ from `unknown` in TypeScript?
+
+let value : any
+
+value = 10
+value = "Hello"
+value = false
+
+
+
+---------
+
+Q3. What is the significance of optional parameter in typescript? // Refere in future class to polymorphism concept of typesctipy//method overloading
+
+---------
+
+Q4.Reverse words in a sentence: "hello world" → "world hello".
+
+---------
+
+Q5. Write a function that accepts string | number and returns length if string, or double the number if number.”
+
+string == datatype => length
+number == datatyoe => double the value
+
+Frames :
+---
+
+Q6. Nested Frames with Dynamic IDs
+
+Q:
+A legacy banking app uses nested iframes. The inner iframe’s ID is dynamic (e.g., `frame_882`).  
+How do you reliably click a button inside it without using the dynamic ID, and how do you avoid timeout if it loads slowly?
+
+frame({url:"""})
+
+frame({name:"frame2"}) // here no auto wait mechanism
+
+frameLocator("") // has the feature autowait
+
+---------------------------------------------------------------
+
+Q7. Parallel Tests with storageState
+
+Q:
+Test A runs as Admin, Test B as a standard user. Both reuse storageState to skip login. How do you ensure isolation?
+
+----------------------
+
+Q8. You saved storageState yesterday but tests fail today due to expired auth tokens. How would your framework detect this and automatically refresh state without human intervention?
+
+if(await page.locator('.login-button').isVisibile()){
+await loginAndSaveState() // storage state function => invoke to store the cookies in .json()
+}
+
+Q9. Dialog Handling Timing
+
+
+Will this code correctly handle dialogs?
+
+page.on('dialog', async (dialog) => { //listener // being online class
+  console.log(dialog.message());
+  await dialog.type('My Input Text');
+});
+
+await page.getByRole('button').click(); // you will know abt the session
+
+
+Q10. Window Handling (Popups & Tabs)
+
+The Question:
+"You click a button that opens a third-party payment gateway in a new tab. How do you capture that tab, and why is using Promise.all essential here instead of just awaiting the click first?"
+The Problem: When you await a click, the code execution pauses until the click action is complete. During that micro-second, the browser might have already opened the new tab. If your waitForEvent('page') starts after that, it misses the "open" event entirely, and your test hangs forever.
+
+=> sequential
+=> concurrent 
+
+await Promise.all(["waitForEvent(page),locator.click()"])
+
+by using Promise.all both the actions and capturing of the page using the listerner happens simultanelously so that we dont miss to capture the new page that pops up
+
+-------------
+
+line by line sequentially :
+
+waitForEvent(page) // listerner first
+
+"locator.click() // action
+
+Above approach tend miss to capture the page that pops up
+
+
+Q11. Google Apps Launcher:
+4. Launch https://www.google.com/, click the Google apps icon, and print all available app names.

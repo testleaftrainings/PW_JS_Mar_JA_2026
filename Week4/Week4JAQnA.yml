@@ -1,0 +1,218 @@
+
+
+
+Q1. How does TypeScript determine the data type of a variable when no type is not mentioned?
+
+TypeScript automatically assigns the datatype based on the value given to the variable. This is called type inference.
+
+Implicit inference
+------------------
+Implicit type inference means TypeScript automatically understands the data type of a variable based on the value assigned to it.
+
+let city = "Chennai";   // inferred as string
+let count = 100;        // inferred as number
+let isActive = true;    // inferred as boolean
+
+explicit inference
+------------------
+
+Explicit type inference is when you manually specify the data type of a variable in TypeScript.
+
+ex: let age: number = 25;
+    let name: string = "Gauthami"; 
+
+----------------------------------------------------------------------------------------------------------
+
+Q2. How does datatype `any` differ from `unknown` in TypeScript?
+
+Ans: these are the dataTypes available in Typescript
+
+1) any
+
+Definition: any allows any type of value.
+TypeScript stops checking type safety for that variable.
+
+let value: any;
+
+value = 10;
+value = "Hello";
+value = true;
+
+console.log(value); // TypeScript allows everything
+
+Pros: Very flexible
+Cons: No type safety → can lead to runtime errors
+
+2) unknown
+
+Definition:unknown also allows any type, but TypeScript forces you to check the type before using it.
+Safer than any.
+
+EX:
+let value: unknown;
+
+value = 10;
+value = "Hello";
+
+// console.log(value.toUpperCase()); //  Error: Object is of type 'unknown'
+
+// Type check needed
+if (typeof value === "string") {
+  console.log(value.toUpperCase()); // Works
+}
+
+Pros: Flexible and type-safe
+Cons: Need to do type checks before using
+-
+----------------------------------------------------------------------------------------------------------
+
+
+Q3. What is the significance of optional parameter in typescript?
+
+In TypeScript, optional parameters allow a function to be called with or without that argument, making the function more flexible and avoiding errors when a value 
+is not provided.
+
+Example: Optional Function Parameter(TS)
+-------------------------------------------
+
+function greet(name?: string) {
+  if (name) {
+    console.log(`Hello, ${name}!`);
+  } else {
+    console.log("Hello, Guest!");
+  }
+}
+
+greet("Ravi"); // Hello, Ravi!
+greet();            // Hello, Guest!
+
+
+The ? after a parameter makes it optional — no error even if you don’t pass that argument.
+Without ?, the argument is required and calling the function without it will throw an error//❌ Error – Argument required.
+
+
+
+--------------------------------------------------------------------
+
+Q3.Reverse words in a sentence: "hello world" → "world hello".
+
+function reverseWords(sentence: string): string {
+
+// Step 1: Split the sentence into words
+
+const words = sentence.split(" ");
+
+
+// Step 2: Reverse the array of words
+
+const reversed = words.reverse();
+
+
+// Step 3: Join back into a string
+
+return reversed.join(" ");
+
+}
+
+// Example:
+
+console.log(reverseWords("hello world")); // Output: "world hello"
+
+--------------------------------------------------------------------------------------------
+
+Q4. Write a function that accepts string | number and returns length if string, or double the number if number.”
+
+function process(input: string | number): number {
+
+if (typeof input === "string") return input.length;
+
+return input * 2;
+
+}
+
+--------------------------------------------------------------------------------------------
+
+Frames :
+---
+
+Q5. Nested Frames with Dynamic IDs
+
+Q:
+A legacy banking app uses nested iframes. The inner iframe’s ID is dynamic (e.g., `frame_882`).  
+How do you reliably click a button inside it without using the dynamic ID, and how do you avoid timeout if it loads slowly?
+
+A: 
+Use Playwright’s `frameLocator()` to reference iframes by stable selectors, not IDs. `frameLocator()` auto-waits for nested frames and elements before interaction.
+
+const outerFrame = page.frameLocator('iframe[data-test="transaction-container"]');
+const innerFrame = outerFrame.frameLocator('iframe');
+await innerFrame.getByRole('button', { name: 'Submit Transaction' }).click();
+
+Playwright’s auto-waiting prevents timeouts if the frame or elements load slowly.
+
+--------------------------------------------------------------------------------------------
+
+Q6. Parallel Tests with storageState
+
+Q:
+Test A runs as Admin, Test B as a standard user. Both reuse storageState to skip login. How do you ensure isolation?
+
+A:
+Create separate browser contexts for each user state:
+
+const adminContext = await browser.newContext({ storageState: 'adminState.json' });
+const userContext = await browser.newContext({ storageState: 'userState.json' });
+
+Avoid sharing the same storage file between parallel tests to prevent race conditions.
+
+--------------------------------------------------------------------------------------------
+
+Q7. You saved storageState yesterday but tests fail today due to expired auth tokens. How would your framework detect this and automatically refresh state without human intervention?
+
+if (await page.locator('.login-button').isVisible()) {
+  await loginAndSaveState();
+}
+
+--------------------------------------------------------------------------------------------
+Q8. Dialog Handling Timing
+
+Q:
+Will this code correctly handle dialogs?
+
+await page.getByRole('button').click();
+page.on('dialog', async dialog => {
+  console.log(dialog.message());
+  await dialog.accept('My Input Text');
+});
+
+A:
+No — the listener must be registered before the click:
+
+page.on('dialog', async dialog => {
+  console.log(dialog.message());
+  await dialog.accept('My Input Text');
+});
+await page.getByRole('button', { name: 'Confirm' }).click();
+
+--------------------------------------------------------------------------------------------
+
+Q9. Google Apps Launcher:
+4. Launch https://www.google.com/, click the Google apps icon, and print all available app names.
+
+
+------------------------------------------------
+
+Q10. Window Handling (Popups & Tabs)
+
+The Question:
+"You click a button that opens a third-party payment gateway in a new tab. How do you capture that tab, and why is using Promise.all essential here instead of just awaiting the click first?"
+The Problem: When you await a click, the code execution pauses until the click action is complete. During that micro-second, the browser might have already opened the new tab. If your waitForEvent('page') starts after that, it misses the "open" event entirely, and your test hangs forever.
+The Solution: Promise.all creates a "listening" state and an "action" state simultaneously.
+
+---
+---------------------------------------------
+
+Home Assignment:
+----------------
+Q9. Google Apps Launcher:
+4. Launch https://www.google.com/, click the Google apps icon, and print all available app names.
