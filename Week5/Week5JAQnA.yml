@@ -1,0 +1,269 @@
+
+
+1. Verify File Download and Check Size
+
+Q:
+A report is downloaded. How do you verify the download succeeded and confirm the file size?
+
+A:
+
+import fs from 'fs';
+
+const [download] = await Promise.all([
+  page.waitForEvent('download'),
+  page.click('#download-report-btn'),
+]);
+
+const filePath = './downloads/' + download.suggestedFilename();
+await download.saveAs(filePath);
+
+expect(fs.existsSync(filePath)).toBe(true);
+const stats = fs.statSync(filePath);
+expect(stats.size).toBeGreaterThan(0);
+
+This confirms the file exists and isn’t empty.
+
+------------------------------------------------------------------------
+
+2. Hidden File Upload Input
+
+Q:
+How do you upload a file if the <input type="file"> is hidden via CSS?
+
+A:
+Playwright can set files directly on hidden inputs:
+
+await page.locator('input[type="file"]').setInputFiles('tests/data/file.pdf');
+
+Or use a file chooser if triggered by a button:
+
+const chooser = await page.waitForEvent('filechooser');
+await page.getByRole('button', { name: 'Upload' }).click();
+await chooser.setFiles('tests/data/file.pdf');
+
+------------------------------------------------------------------------
+
+
+3. Retry Logic for Downloads
+
+Q:
+Sometimes downloads fail due to load — how do you implement retry logic without hiding real errors?
+
+A:
+Wrap download logic in a retry loop with limited tries and explicit logging:
+
+async function downloadWithRetry(page, maxRetry = 3) {
+
+  for (let attempt = 1; attempt <= maxRetry; attempt++) {
+    try {
+      const [download] = await Promise.all([
+        page.waitForEvent('download'),
+        page.click('#downloadbtn'),
+      ]);
+      await download.saveAs(`./downloads/${download.suggestedFilename()}`);
+      return true;
+    } catch (err) {
+      console.warn(`Attempt ${attempt} failed: ${err.message}`);
+      if (attempt === maxRetry) throw err;
+      await page.waitForTimeout(1000);
+    }
+  }
+}
+
+
+✅ Success Case
+
+return true;
+
+If download succeeds → exit function immediately
+No more retries needed
+
+❌ Error Handling + Logging
+
+catch (err) {
+  console.warn(`Attempt ${attempt} failed: ${err.message}`);
+Logs failure for each attempt
+Helps debugging flaky tests
+
+Example log:
+
+Attempt 1 failed: Timeout 30000ms exceeded
+🚫 Final Failure Condition
+
+if (attempt === maxRetry) throw err;
+
+If last attempt fails → throw error
+
+Test will fail properly (important for CI)
+
+------------------------------------------------------------------------
+
+4. Assert File Type Before Upload
+
+Q:
+How do you validate the file type before uploading?
+
+A:
+
+import path from 'path';
+
+const ext = path.extname(filePath);
+expect(ext).toBe('.pdf'); // or any expected type
+
+------------------------------------------------------------------------
+
+
+5. Assert File Size Before Upload
+
+Q:
+Before uploading, how do you check file size?
+
+A:
+
+import fs from 'fs';
+
+const stats = fs.statSync(filePath);
+expect(stats.size).toBeGreaterThan(0);
+
+
+------------------------------------------------------------------------
+
+6."When would you choose CSV over JSON for test data? How do you iterate through a JSON array to generate dynamic test cases in Playwright?"
+Use for Data-Driven Testing (DDT) where you have hundreds of permutations of the same flat fields (e.g., a search field test with 500 different strings). It’s memory-efficient for the runner.
+json:
+ex : testcase.json
+
+[
+ {
+   "username": "admin_user",
+   "role": "admin",
+   "details": {
+     "permissions": ["create_user", "delete_user", "edit_settings"],
+     "accessLevel": 10
+   }
+ },
+ {
+   "username": "guest_user",
+   "role": "guest",
+   "details": {
+     "viewOnly": true,
+     "expiryDays": 7
+   }
+ }
+]
+
+for(let i=0; i<=1; i++){
+testcase[i].details.permissions
+}
+
+testcase[0].details.permissions // admin_user
+testcase[1].details.expirtDays // admin_user
+
+
+
+Best for nested, hierarchical data or when specific keys vary per object.
+Iteration in Playwright
+
+------------------------------------------------------------------------
+
+7.Explain how you structure .env.qa, .env.staging, .env.prod, and how your Playwright config dynamically selects the correct values at runtime.
+
+
+import dotenv from 'dotenv';
+
+const env = process.env.ENV || 'qa';
+
+dotenv.config({ path: `.env.${env}` });
+
+export default defineConfig({
+  use: { baseURL: process.env.BASE_URL }
+});
+
+
+------------------------------------------------------------------------
+
+8.Your CI must run smoke tests on PRs and full regression on nightly builds. How will you configure Playwright test runner to support this?
+
+Use tags (e.g., @smoke) and grep.
+Command Line:
+Smoke (PR): npx playwright test --grep @smoke
+
+- name: Run Smoke Tests
+    if: github.event_name == 'pull_request'
+    run: npx playwright test --grep @smoke
+
+  RUN FULL REGRESSION ON SCHEDULE
+  - name: Run Full Regression
+    if: github.event_name == 'schedule'
+    run: npx playwright test
+
+
+------------------------------------------------------------------------
+
+9.“In the CSV file, some rows have extra optional fields (e.g. discount codes) that only apply if non-empty. How would you handle these optional fields in a robust Playwright parameterized test?
+
+When parsing the CSV, use the columns: true and relax_column_count: true options. This prevents the parser from throwing an error if Row 5 has 3 columns but Row 6 only has 2.
+typescript
+const records = parse(fs.readFileSync('data.csv'), {
+columns: true,
+skip_empty_lines: true,
+ relax_column_count: true // Don't crash if columns are missing
+});
+
+
+------------------------------------------------------------------------
+
+10.How do you conditionally skip a test only on the 'Production' environment using annotations?"
+
+The Answer: Use test.skip(). You combine it with your .env logic to ensure certain tests (like "Delete User") never run on Live.
+test('Delete User Account', async ({ page }) => {
+ // If the environment is 'prod', this test will be skipped immediately
+
+test.skip(process.env.ENV === 'prod', 'Data deletion is not allowed in Production'); 
+
+await page.goto('/settings');
+await page.click('#delete-account');
+
+});
+Use code with caution.
+
+
+------------------------------------------------------------------------
+
+11."What is the difference between test.describe.configure({ mode: 'serial' }) and test.describe.parallel()?"
+The Answer:
+mode: 'serial': Runs tests in the same file one after another. Crucially, if one test fails, all subsequent tests in that file are skipped. Use this for dependent flows (e.g., Test 1: Create User, Test 2: Edit User, Test 3: Delete User). [1, 2]
+parallel(): Forces Playwright to run tests within a single file across multiple workers simultaneously to save time. [3, 4]
+
+
+------------------------------------------------------------------------
+
+12.You have a very heavy test that takes 2 minutes, but your global timeout is 30 seconds. How do you handle this without changing the global config?"
+The Answer: Use test.slow().
+This annotation triples the default timeout for that specific test. If your global timeout is 30s, test.slow() makes it 90s.
+
+------------------------------------------------------------------------
+
+13.You want smoke tests to run first with minimal retries, and full regression to run later with retries and videos. How would you split this using Playwright config?
+
+
+projects: [
+{
+  name: 'Smoke',
+  testMatch: /.*smoke.spec.ts/,
+  retries: 0,
+},
+{
+  name: 'Regression',
+  testIgnore: /.*smoke.spec.ts/,
+  retries: 2,
+  use: { video: 'on', trace: 'retain-on-failure' },
+},
+]
+Logical Separation via testMatch and testIgnore
+testMatch in Smoke: This ensures the Smoke project only looks for files ending in .smoke.spec.ts. It creates a focused, high-speed execution gate.
+testIgnore in Regression: In a full regression, you often want to run everything. However, if your Smoke tests are already running in a different CI job, you might use testIgnore to prevent redundancy,
+
+npx playwright test --project=Smoke: Runs only the fast, zero-retry tests.
+npx playwright test --project=Regression: Runs the heavy, resilient suite.
+

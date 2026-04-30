@@ -1,0 +1,35 @@
+Questions :
+
+1. Verify File Download and Check Size
+Q:
+A report is downloaded. How do you verify the download succeeded and confirm the file size?
+
+2. Hidden File Upload Input
+Q:
+How do you upload a file if the <input type="file"> is hidden via CSS?
+
+3. Retry Logic for Downloads
+Q:
+Sometimes downloads fail due to load — how do you implement retry logic without hiding real errors?
+
+4. Assert File Type Before Upload
+Q:
+How do you validate the file type before uploading?
+
+5. Assert File Size Before Upload
+Q:
+Before uploading, how do you check file size?
+
+6."When would you choose CSV over JSON for test data? How do you iterate through a JSON array to generate dynamic test cases in Playwright?"
+
+7.Explain how you structure .env.qa, .env.staging, .env.prod, and how your Playwright config dynamically selects the correct values at runtime.
+
+8.Your CI must run smoke tests on PRs and full regression on nightly builds. How will you configure Playwright test runner to support this?
+
+9.“In the CSV file, some rows have extra optional fields (e.g. discount codes) that only apply if non-empty. How would you handle these optional fields in a robust Playwright parameterized test?
+
+10.How do you conditionally skip a test only on the 'Production' environment using annotations?"
+
+11."What is the difference between test.describe.configure({ mode: 'serial' }) and test.describe.parallel()?"
+
+12.You have a very heavy test that takes 2 minutes, but your global timeout is 30 seconds. How do you handle this without changing the global config?"
