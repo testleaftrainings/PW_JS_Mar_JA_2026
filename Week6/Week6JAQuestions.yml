@@ -1,0 +1,24 @@
+Week6JAQuestions
+---
+
+1.How do you configure a global APIRequestContext so that every request automatically includes a baseURL, so you don't have to repeat them in every file?
+
+2.Let's say an api request is returning nearly a 1000 record what are the validation you  will be perfomrming in that response
+
+3.can you tell me the differnece between 401 and 403
+
+4.can you tell me the differnece between 503 and 504
+
+5. how will you be calculating and performance or responcse time of api in the playwright api fixtures 
+
+6. 302 through which we can stop the redirect of the API URL so that we could see the response up to the point before it redirects. Can we stop the redirection through any mechanism?
+
+7.How can API testing be integrated with browser-based testing in Playwright?
+
+8. What are the limitations of API testing using Playwright compared to Postman or REST Assured?**
+
+9.What are some challenges you faced while integrating API and UI tests in Playwright?**
+
+10. How do you handle "Race Conditions" where a UI test starts before the API data is ready?
+
+11.What are "Negative Scenarios" you should test?

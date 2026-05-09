@@ -1,0 +1,334 @@
+Week6JAQuestions
+---
+
+1.How do you configure a global APIRequestContext so that every request automatically includes a baseURL, so you don't have to repeat them in every file?
+
+You can configure a global APIRequestContext with default headers and a baseURL in your Playwright configuration file (playwright.config.ts) 
+
+ use: {
+    // Other options...
+
+    // Configure the API base URL and default headers
+    baseURL: 'https://example.com',
+    extraHTTPHeaders: {
+      'Accept': 'application/json',
+     },
+  },
+
+------------------------------------------------------------------------------------------------------------------
+
+2.Let's say an api request is returning nearly a 1000 record what are the validation you  will be perfomrming in that response
+
+Status Code
+Response Time
+Schema Validation:
+
+------------------------------------------------------------------------------------------------------------------
+
+3.can you tell me the differnece between 401 and 403
+
+401 Unauthorized: The client is not authenticated and needs to provide valid authentication credentials (e.g., log in or provide a correct token) to access the resource 
+
+403 Forbidden: The client is authenticated, but does not have the necessary permissions to access the requested resource. The server refuses the action entirely
+
+------------------------------------------------------------------------------------------------------------------
+
+4.can you tell me the differnece between 503 and 504
+
+503 Service Unavailable: The server is temporarily unable to handle the request due to maintenance or being overloaded.
+
+504 Gateway Timeout: The server, while acting as a gateway or proxy, did not receive a timely response from an upstream server it needed to access to complete the request 
+ 
+ ------------------------------------------------------------------------------------------------------------------
+
+5. how will you be calcualting and performance or response time of api in the playwright api fixtures 
+
+test('should return data within performance threshold', async ({ request }) => {
+  const startTime = perfomrance.now(); // Alternative manual calculation
+  const response = await request.get('/records');
+  const endTime = performance.now();
+  const duration = endTime - startTime;
+
+  expect(response.status()).toBe(200);
+  // Assert the duration is within an acceptable limit
+  expect(builtinDuration).toBeLessThan(1000); // e.g., less than 1 second
+  console.log(`Response time: ${builtinDuration}ms`);
+});
+
+------------------------------------------------------------------------------------------------------------------
+
+6. 302 through which we can stop the redirect of the API URL so that we could see the response up to the point before it redirects. Can we stop the redirection through any mechanism?
+
+test('should check redirect status', async ({ request }) => {
+  const response = await request.get('/short-url', {
+    maxRedirects: 0, // Ensures no redirects are followed
+  });
+  
+  // The response status will be 302 (Found)
+  expect(response.status()).toBe(302);
+  // You can also check the new location header
+  expect(response.headers()['location']).toBe('https://example.com');
+});
+
+Setting maxRedirects to 0 achieves the desired control 
+
+------------------------------------------------------------------------------------------------------------------
+
+7.How can API testing be integrated with browser-based testing in Playwright?
+
+ Example:
+
+  Use API to **create a user/session** → get auth token.
+  Use that token in browser context → skip login UI.
+
+  Explanation :
+
+  test('Login using API + continue in UI', async ({ request, page }) => {
+
+    // API Login
+    const response = await request.post('/login', {
+        data: {
+            username: 'admin',
+            password: 'test123'
+        }
+    })
+
+    const responseBody = await response.json()
+
+    const token = responseBody.token
+
+    // Inject token into browser
+    await page.addInitScript(token => {
+
+        localStorage.setItem('token', token)
+
+    }, token)
+
+    // Open application
+    await page.goto('https://example.com/dashboard')
+
+})
+
+
+Playwright secretly inserts:
+
+localStorage.setItem('token', token)
+
+into browser storage.
+
+So when website opens,
+website checks:
+
+"Do I already have login token?"
+
+Answer:
+
+YES
+
+So app skips login page.
+
+What Happens Internally?
+
+This code:
+
+await page.addInitScript(token => {
+
+    localStorage.setItem('token', token)
+
+}, token)
+
+means:
+
+Step 1
+
+Before page loads,
+
+Playwright injects JavaScript into browser.
+
+Step 2
+
+That JavaScript stores token in:
+
+Browser Local Storage
+
+like:
+
+token = abc123
+Step 3
+
+Then application loads.
+
+Application reads token from storage.
+
+Step 4
+
+Application thinks:
+
+User already authenticated
+
+addInitScript()
+
+runs BEFORE application JavaScript executes.
+
+That is why it is preferred for:
+
+authentication
+mocking
+overriding browser APIs
+setting storage values early
+-----
+
+Without addInitScript()
+
+Open Website
+↓
+Website checks token
+↓
+No token found
+↓
+Show Login Page
+
+----
+
+With addInitScript()
+
+Inject token first
+↓
+Open Website
+↓
+Website checks token
+↓
+Token found
+↓
+Open Dashboard directly
+
+------------------------------------------------------------------------------------------------------------------
+  
+8. What are the limitations of API testing using Playwright compared to Postman or REST Assured?**
+
+Playwright’s API testing  is **basic** (good for integration with UI tests).
+Postman/REST Assured are more feature-rich for:
+
+  * Extensive assertions
+  * Advanced data-driven testing
+  * Load/performance testing
+  
+9.What are some challenges you faced while integrating API and UI tests in Playwright?**
+
+----
+1. Keeping test data consistent between API & UI.
+
+ How to Explain in Interview
+
+You can say:
+
+One challenge I faced was maintaining consistency between API-created data and UI validation.
+Sometimes data created through API was not immediately reflected in the UI due to caching or backend synchronization delays.
+This caused flaky failures where API succeeded but UI validation failed temporarily.
+
+------
+2. Managing authentication/session tokens across layers.
+
+ Interview Explanation
+
+One challenge I faced while integrating API and UI testing in Playwright was managing authentication and session tokens across both layers.
+
+In our framework, APIs required bearer tokens for authentication, while the UI maintained its own browser session using cookies or local storage.
+
+The challenge was ensuring that the same authenticated user context was maintained consistently between API calls and browser interactions.
+
+Real-Time Use Case
+
+For example, we used API login to generate an access token and then injected that token into the browser session to bypass UI login.
+
+Sometimes tokens expired during long test executions, or the UI and API used different session handling mechanisms.
+
+This caused failures where:
+
+API requests succeeded
+but UI showed user as logged out
+
+or vice versa.
+
+Simple Scenario to Explain
+Flow
+API Login → Token Generated
+↓
+Inject token into browser
+↓
+Open application
+Problem
+
+After some time:
+
+API token expired
+OR
+browser session expired
+
+Then:
+
+API starts returning 401
+UI redirects to login page
+
+Result:
+
+flaky failures
+Another Strong Real-Time Example
+
+Based on your Salesforce/API experience:
+
+In Salesforce API automation, we generated OAuth tokens dynamically.
+
+One challenge was securely sharing and reusing those tokens across multiple API and UI test flows without hardcoding them.
+
+We handled this using environment variables, reusable fixtures, and centralized token management utilities.
+
+---------
+3. Flaky tests if API is unstable.
+
+ One challenge I faced during API and UI integration testing was flaky test failures caused by unstable APIs.
+
+Sometimes backend APIs were slow, temporarily unavailable, or returned intermittent errors like 500 or timeout responses.
+
+Since the UI depended on those APIs, the UI tests also failed even though the automation script itself was correct.
+
+---
+
+10. How do you handle "Race Conditions" where a UI test starts before the API data is ready?
+
+Use page.waitForResponse() or page.waitForRequest(). Instead of using hard-coded sleep or timeout, you wait for the specific API trigger that signals the UI is ready to be interacted with.
+
+Problem
+
+Automation tries:
+
+await page.fill('#search', 'Ravi')
+
+await page.click('text=Ravi')
+
+before search API returns data.
+
+Stable Solution:
+
+await page.fill('#search', 'Ravi')
+
+await page.waitForResponse(response =>  // API response is done to validate if  the API call has completed the fetching of that particular lead/resource
+    response.url().includes('/lead/search') &&
+    response.status() === 200
+)
+
+await page.click('text=Ravi')
+
+
+Difference Between waitForRequest() and waitForResponse()
+Method	Purpose
+waitForRequest()	Wait until API call is sent
+waitForResponse()	Wait until API response is received
+
+
+11.What are "Negative Scenarios" you should test?
+
+Sending an empty body to a POST request.
+Using invalid data types (e.g., sending a string where an number is expected).
+Requesting a resource that doesn't exist (404).
+Sending an expired or malformed token (401).

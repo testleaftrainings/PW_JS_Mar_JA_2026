@@ -1,0 +1,355 @@
+API Fundamentals:
+
+
+REST API -> Representational State Transfer Application Programming Interface.
+
+
+
+Interview Based Questions :
+-------------------------
+
+1. Architectute Type?
+REST API's follow's Client server archirtecture.
+Micro services.
+
+2. HTTP Request Methods :(CRUD operations--> Create Update Retrieve, Delete)
+POST, PUT, PATCH, GET, DELETE
+
+3. Difference between URI and URL?
+
+A URI (Uniform Resource Identifier) is a string that uniquely identifies a resource, while a URL (Uniform Resource Locator) is a type of URI that specifies the resource’s location (address) and how to access it.
+
+4. Stateless/ Statefull?
+
+A stateless system means:
+Each request is independent — the server does not remember anything about previous requests.
+
+A stateful system means:
+The server remembers information (state) between requests.
+
+REST API follow stateless, which means request contains all the information needed to process your activity. 
+
+5.Difference between Authentication and Authorization?
+Authentication verifies identity , while authorization checks access rights.
+
+| Concept           | **Authentication**                                   | **Authorization**                                                        |
+| ----------------- | ---------------------------------------------------- | ------------------------------------------------------------------------ |
+| **Meaning**       | It verifies **who you are**                          | It defines **what you can do**                                           |
+| **Purpose**       | Confirms the **identity** of a user                  | Grants or restricts **access/permissions**                               |
+| **Happens When?** | Always happens **before** authorization              | Happens **after** authentication                                         |
+| **Example**       | You log in with your username and password           | Once logged in, you can access only your own profile, not admin settings |
+| **Analogy**       | Showing your ID card at the gate                     | Being allowed to enter only certain rooms based on your role             |
+
+
+6. Various Response Code?
+Response Codes liek 201 Created, 200 (OK), 401(Unauthorized), 404(NOt found).
+
+200 series --> success of what ecer api action that you implement (eg POST, GET, PUT, PATCH, DELETE )
+400 series --> Client side error. (ex username, password, endpoint , request body format)
+500 series --> Server side error. (ex server down)
+
+7. Request Headers ?
+
+Headers are key-value pairs sent along with the request that describe how the client and server should communicate.
+
+Example : 
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer <token>
+
+8. Schema Validation and response validation?
+
+Schema Validation :
+
+Schema validation checks if the data structure (keys + value types) in the response matches the expected format.
+
+Example:
+
+{
+"id":101,
+"name":"Ravi",
+"isActive":true
+}
+
+{
+"id":"101",           //id is a string not a number
+"name":"Ravi",
+"isActive":true
+}
+
+--------------
+
+Response validation:
+Response validation checks the actual values returned, not just the data type.
+
+Example:
+
+{
+"id":101,
+"name":"Ravi",
+"isActive":true
+}
+
+{
+"id":"101",           //wrong value reponse validation
+"name":"Ravi",
+"isActive":false
+}
+
+---
+
+9. Difference between REST API and REST ASSURED?
+
+REST API is the actual web services, while REST ASSURED is a Java Library used to test REST API's.
+
+---
+10. Path parameter and query parameter?
+
+| Feature             | **Path Parameter**                                      | **Query Parameter**                       |
+| ------------------- | ------------------------------------------------------- | ----------------------------------------- |
+| **Purpose**         | Identifies a **specific resource**                      | Filters or customizes the **result**      |
+| **Location in URL** | Part of the **URL path**                                | Comes **after `?`** in the URL            |
+| **Syntax Example**  | `/users/101`                                            | `/users?id=101`                           |
+| **UsempId**           | To point to one resource (like a specific user or lead) | To send filters, search terms, or options |
+| **Visibility**      | Mandatory part of the endpoint                          | Optional part of the endpoint             |
+| **Separator**       | `/` slash                                               | `?` for first, `&` for multiple           |
+
+
+
+---
+11. Five Steps process for API testing
+------------------------------------
+
+1. Documentation
+: Understanding the API’s purpose, structure, and usempId guidelines before testing.
+Example: 
+: Reading Swagger docs that describe how the incident API works in an application.
+
+2. Endpoints: 
+: Specific URLs that represent resources or actions to be tested.
+Example: 
+: https://dev267889.service-now.com/login.do?user_name=admin&sys_action=sysverb_login&user_password=%25eBzU%24kw5VC8 (incident resource).
+
+3. Methods: 
+: HTTP operations (GET, POST, PUT, DELETE, etc.) that define the type of action on the resource.
+Example: 
+: GET /incident → fetch incidents; POST /incident → create a new incident.
+
+4. Headers: 
+: Metadata sent with requests or responses to control and describe API behavior.
+Example: 
+Content-Type: application/json, Accept: application/json.
+
+5. Authorization: 
+: Security mechanism to verify and allow only valid users or systems to access the API.
+Example: 
+Authorization: Bearer <token> or Basic Auth with username & password.
+
+Together, these 5 steps ensure your API test covers what, where, how, and who can access the service.
+********************************************************************************************
+
+
+What is ServiceNow?
+
+ServiceNow is an IT Service Management (ITSM) tool — it helps companies handle things like:
+
+Reporting IT issues (e.g., “My laptop won’t start”)
+
+Requesting new hardware/software
+
+Tracking incidents, changes, and problems
+
+Automating workflows across departments
+
+It’s like a one-stop system for all service requests within a company — IT, HR, facilities, finance, etc.
+
+---------------------------
+
+Service instance , username and password :
+
+https://dev267889.service-now.com/login.do?user_name=admin&sys_action=sysverb_login&user_password=%25eBzU%24kw5VC8
+
+username : admin
+password : %eBzU$kw5VC8
+
+---------------------------------
+
+# Serialization and Deserialization in REST API (TypeScript)
+
+In **REST APIs**, **serialization** and **deserialization** are about **converting data between objects and a format that can travel over the network** (like JSON).
+
+This is extremely important when working with **API testing, Playwright API testing, or frontend-backend communication**.
+
+---
+
+## 1️⃣ What is Serialization?
+
+### ✅ Definition
+
+**Serialization** is the process of **converting a TypeScript/JavaScript object into JSON** so it can be sent over HTTP.
+
+📦 Object → 📄 JSON
+
+---
+
+### 🔹 Real-life analogy
+
+Think of **serialization** like:
+
+> Packing your luggempId into a **suitcase** before travelling ✈️
+
+Clothes (object) → packed suitcase (JSON)
+
+---
+
+### 🔹 Example (REST API Request)
+
+#### TypeScript object
+
+```ts
+const user = {
+  name: "Ravi",
+  empId: 30,
+  city: "Chennai"
+};
+```
+
+#### After serialization (JSON sent in request body)
+
+```json
+{
+  "name": "Ravi",
+  "empId": 30,
+  "city": "Chennai"
+}
+```
+
+➡️ This JSON is what actually travels over HTTP.
+
+> In JavaScript/TypeScript, this conversion is usually done using:
+
+```ts
+JSON.stringify(user);
+```
+
+---
+
+### 🔹 Where serialization happens
+
+* When **client sends request body**
+* While calling **POST / PUT / PATCH APIs**
+
+---
+
+## 2️⃣ What is Deserialization?
+
+### ✅ Definition
+
+**Deserialization** is the process of **converting received JSON back into a TypeScript object**.
+
+📄 JSON →  Object
+
+---
+
+### 🔹 Real-life analogy
+
+Think of **deserialization** like:
+
+> Unpacking your suitcase after reaching your destination 🧳
+
+Suitcase (JSON) → clothes (object)
+
+---
+
+### 🔹 Example (REST API Response)
+
+#### API Response (JSON)
+
+```json
+{
+  "id": 101,
+  "name": "Ravi",
+  "empId": 30,
+  "city": "Chennai"
+}
+```
+
+#### After deserialization (TypeScript object)
+
+const responseBody = await response.json(); // JSON → Object
+console.log(responseBody.name); // Ravi
+
+
+> This is internally similar to:
+
+```ts
+JSON.parse(jsonString);
+```
+
+---
+
+### 🔹 Where deserialization happens
+
+* When **client receives response**
+* While validating **API responses**
+
+---
+
+## 3️⃣ Serialization vs Deserialization (Quick Table)
+
+| Aspect     | Serialization | Deserialization |
+| ---------- | ------------- | --------------- |
+| Direction  | Object → JSON | JSON → Object   |
+| Used in    | Request body  | Response body   |
+| Happens at | Client side   | Client side     |
+| Purpose    | Send data     | Read / validate |
+
+---
+
+## 4️⃣ Why are they important in REST API testing?
+
+Especially useful when you do **automation** using **Playwright API**, **Axios**, or **Fetch**.
+
+### 🔹 Benefits
+
+✅ Cleaner code
+✅ Easy request creation
+✅ Type safety (with interfaces)
+✅ Less manual JSON handling
+
+---
+
+## 5️⃣ Example in Playwright API Testing
+
+### 🔹 Serialization (request)
+
+```ts
+await request.post("/users", {
+  data: user   // Object auto-serialized to JSON
+});
+```
+
+---
+
+### 🔹 Deserialization (response)
+
+```ts
+const response = await request.get("/users/101");
+const userData = await response.json(); // JSON → Object
+
+console.log(userData.name);
+```
+
+---
+
+## 6️⃣ Simple 
+
+> **Serialization = Send**
+> **Deserialization = Receive**
+
+---
+
+## 7️⃣ In short
+
+> **Serialization** converts a TypeScript object into JSON so it can be sent in a REST API request.
+> **Deserialization** converts the received JSON response back into a TypeScript object for easy processing and validation.
