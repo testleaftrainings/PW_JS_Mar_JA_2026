@@ -1,0 +1,29 @@
+QUestions :
+---
+
+1.What are the four main OOP principles? Explain how each one can be used in a test automation framework
+
+2.What is Inheritance in OOP?
+
+3.What is a constructor in a class?
+Why is it commonly used in Page Object Model classes?
+
+4.In an automation framework, why would you make locators or methods private inside a Page Object class?
+
+5.What is the Page Object Model, and why is it considered a best practice in automation frameworks?
+
+6.If two pages share similar functionality such as:
+
+search()
+logout()
+navigation menu
+How would you reuse this logic using POM?
+
+7.What are fixtures in Playwright, and why are they important for building scalable frameworks?
+
+
+8.Why would you prefer fixtures instead of beforeEach hooks in a large automation framework?
+
+9.If multiple tests depend on the same test data, how would you avoid data conflicts in parallel execution?
+
+10.There are 2 functions in playwright to enter a value in textbox, one is pressSequentially() and another one is fill(). When to use what?

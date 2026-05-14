@@ -1,0 +1,399 @@
+
+
+1.What are the four main OOP principles? Explain how each one can be used in a test automation framework
+The four core Object-Oriented Programming principles are:
+
+Encapsulation
+
+Inheritance
+
+Polymorphism
+
+Abstraction
+
+How they apply to automation frameworks
+
+Encapsulation
+Encapsulation means bundling data and methods inside a class and restricting direct access.
+
+Example in automation:
+
+Page Object classes store locators and actions together.
+
+class LoginPage {
+  private usernameField
+  private passwordField
+
+  async login(user, pass) { }
+}
+
+Benefit:
+
+Prevents tests from directly accessing locators.
+
+Inheritance
+
+Inheritance allows one class to inherit properties and methods from another class.
+
+Example:
+
+BasePage
+  |
+LoginPage
+DashboardPage
+
+Common methods like:
+
+waitForElement()
+
+click()
+
+navigate()
+
+can exist in BasePage.
+
+Benefit:
+
+Code reuse.
+
+Polymorphism
+
+Polymorphism means the same method name behaving differently depending on context.
+
+Example:
+
+login(user, password)
+login(token)
+
+Same method name → different implementations.
+
+Benefit:
+
+Flexible framework design.
+
+Abstraction
+
+Abstraction hides implementation complexity and exposes only necessary functionality.
+
+Example:
+
+Instead of writing this in tests:
+
+page.locator("#login").click()
+
+Tests call:
+
+loginPage.login()
+
+Benefit:
+
+Cleaner test scripts.
+
+2.What is Inheritance in OOP?
+How would you use inheritance in a Playwright automation framework?
+
+Inheritance is a mechanism where a child class derives properties and methods from a parent class, enabling code reuse and hierarchical structure.Create a BasePage class containing common methods:
+
+class BasePage {
+  constructor(page){
+    this.page = page
+  }
+
+  async click(locator){
+    await this.page.locator(locator).click()
+  }
+}
+
+Then extend it:
+
+class LoginPage extends BasePage {
+  async login(user, pass){
+    await this.click("#login")
+  }
+}
+
+Benefits:
+
+Reusable common functionality
+
+Easier maintenance
+
+Reduced code duplication
+
+
+3.What is a constructor in a class?
+Why is it commonly used in Page Object Model classes?
+
+
+A constructor is a special method in a class that is automatically executed when an object of that class is created.
+
+Example
+class LoginPage {
+
+
+ constructor(page:Page){
+   this.page = page
+ }
+
+}
+Why constructors are used in POM
+
+They are used to:
+
+Initialize the Playwright page object
+
+Initialize locators
+
+Setup dependencies required for the page
+
+Example:
+
+constructor(page){
+ this.page = page
+ this.username = page.locator('#username')
+}
+
+Benefit:
+
+Each Page Object receives the same browser page instance.
+
+
+
+
+4.In an automation framework, why would you make locators or methods private inside a Page Object class?
+
+Locators are usually made private to enforce encapsulation.
+
+Reasons:
+
+Prevent direct access from test files
+
+Ensure locators are used only through page methods
+
+Reduce accidental misuse
+
+Improve maintainability
+
+Example:
+
+class LoginPage {
+
+ private usernameField
+ private passwordField
+
+ async login(user, pass){
+   await this.usernameField.fill(user)
+ }
+}
+
+Tests should call:
+
+loginPage.login()
+
+Not:
+
+page.locator('#username')
+
+5.What is the Page Object Model, and why is it considered a best practice in automation frameworks?
+
+The Page Object Model (POM) is a design pattern where each application page is represented as a class containing:
+
+Page locators
+
+Page actions
+
+Page methods
+
+Example:
+
+LoginPage.ts
+DashboardPage.ts
+ProfilePage.ts
+
+
+Why POM is best practice
+
+Improves test readability
+
+Reduces code duplication
+
+Improves maintainability
+
+Centralizes locators
+
+Example:
+
+If a locator changes:
+
+Update in LoginPage only
+
+
+6.If two pages share similar functionality such as:
+
+search()
+logout()
+navigation menu
+How would you reuse this logic using POM?
+
+Shared functionality can be extracted into a BasePage or component class.
+
+Example
+
+Create BasePage:
+
+class BasePage {
+
+ async search(text){
+ }
+
+ async logout(){
+ }
+
+}
+
+Other pages extend it:
+
+class DashboardPage extends BasePage {}
+class ProductsPage extends BasePage {}
+
+Another approach:
+
+Create component classes
+
+components/
+   navbar.ts
+   search.ts
+
+Then reuse across pages.
+
+Benefit:
+
+Avoid duplicate code.
+
+
+7.What are fixtures in Playwright, and why are they important for building scalable frameworks?
+
+Fixtures in Playwright are reusable setup functions that provide dependencies to tests.
+
+Examples:
+
+browser
+
+page
+
+API context
+
+login session
+
+page objects
+
+Example custom fixture:
+
+
+ customeFixture.ts
+
+export const test = base.extend({
+
+ loginPage: async ({ page }, use) => {
+   const login = new LoginPage(page)
+   await use(login)
+ }
+
+})
+
+
+import test from ' customeFixture.ts'
+test('test',async({page,LoginPage}))
+
+Why fixtures are important
+
+Reduce duplicate setup code
+
+Improve test readability
+
+Manage dependencies efficiently
+
+Enable parallel execution safely
+
+8.Why would you prefer fixtures instead of beforeEach hooks in a large automation framework?
+
+Fixtures are preferred because they provide better dependency management and modular design.
+
+Problems with beforeEach
+
+Hard to reuse across files
+
+Difficult dependency control
+
+Not scalable
+
+Advantages of fixtures
+
+Dependency injection
+
+Reusability
+
+Clear test structure
+
+Better parallel execution
+
+Example usage:
+
+test('login test', async ({ loginPage }) => {
+  await loginPage.login()
+})
+
+Cleaner than writing login logic in beforeEach.
+9.If multiple tests depend on the same test data, how would you avoid data conflicts in parallel execution?
+When tests run in parallel, using shared test data can cause conflicts.
+
+ Generate unique test data
+
+Example:
+
+username = user + timestamp
+date=Date.now()
+ravi+14052026
+
+ Use API to create fresh data
+
+Before each test:
+
+Create user via API
+Run UI test
+Delete user
+
+Use Faker Data
+
+10.There are 2 functions in playwright to enter a value in textbox, one is type and another one is fill. When to use what?
+
+fill() method
+What it does
+
+fill() directly sets the value of the input field. It clears the existing value and inserts the new value instantly.
+
+Example
+await page.locator('#username').fill('ravindran');
+Characteristics
+
+Clears existing text automatically
+
+Inserts the value instantly
+
+What it does
+
+type() simulates real user typing by sending characters one by one, triggering keyboard events like keydown, keypress, and keyup.
+
+Example
+await page.locator('#search').type('Playwright');
+
+You can even simulate typing delay:
+
+await page.locator('#search').type('Playwright', { delay: 100 });
+Characteristics
+
+Types character by character
+
+Triggers keyboard events
+
+Slower than fill()
