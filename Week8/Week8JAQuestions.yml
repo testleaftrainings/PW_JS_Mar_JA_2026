@@ -1,0 +1,86 @@
+
+
+================================================================================
+QUESTION 1: Debugging Random Flaky Tests in CI
+================================================================================
+
+Q: "You have a test suite with 200+ tests running nightly on CI. Over the past
+   week, 5-10 tests fail randomly each night — different tests, different
+   failures. No one has been able to reproduce them locally. How would you
+   systematically identify the root cause of these flaky tests? Walk me through
+   your debugging process from start to finish?"
+
+
+
+================================================================================
+QUESTION 2: Framework Stability Despite Frequent Locator Changes
+================================================================================
+
+Q: "Your development team releases new builds every day, and frontend developers
+   keep changing CSS classes, IDs, and DOM structure. Your Playwright locators
+   break every other day. How would you design a framework that remains stable
+   despite frequent locator changes? Be specific about locator strategies and
+   alternative approaches."
+
+================================================================================
+QUESTION 3: Removing Hard Waits - Proper Synchronization
+================================================================================
+
+Q: "Your test fails intermittently because the application sometimes takes 500ms
+   to load a modal and sometimes takes 5 seconds. A junior engineer added
+   await page.waitForTimeout(5000) everywhere to fix it. How would you remove
+   all hard waits and implement proper synchronization in Playwright? Show code
+   examples."
+
+
+================================================================================
+QUESTION 4: Secure Secret Management in CI/CD
+================================================================================
+
+Q: "Your GitHub Actions pipeline needs to run Playwright tests. You have API
+   keys, database passwords, and third-party secrets required for the tests.
+   Hardcoding them in the test files is not an option. How would you securely
+   store and inject these secrets into your CI/CD pipeline?"
+
+
+================================================================================
+QUESTION 5: Designing a Scalable Playwright Framework from Scratch
+================================================================================
+
+Q: "You're joining a new company as the SDET lead. They have no automation
+   framework. You need to design a Playwright framework from scratch that will
+   scale to 1000+ tests, support multiple environments (QA, Staging, Prod), and
+   be maintainable by 5+ engineers. Draw the architecture and explain each
+   layer's responsibility."
+
+
+================================================================================
+QUESTION 6: Cross-Browser Testing Configuration
+================================================================================
+
+Q: "Your application must work on Chrome, Firefox, and Safari. How would you
+   configure Playwright to run the exact same 500 tests across all three
+   browsers? How would you handle browser-specific failures without duplicating
+   test code? Show configuration examples."
+
+   
+================================================================================
+QUESTION 7: Common Challenges in Automation Framework Development
+================================================================================
+
+Q: "What challenges have you faced while building or maintaining an automation framework, and how did you resolve them?"
+
+================================================================================
+QUESTION 8: Git Commands to Push Code to Remote Repository
+================================================================================
+
+Q: "Explain the steps to push the code to GIT. Explain the Git commands to push
+   the code into remote repository."
+
+
+================================================================================
+QUESTION 9: Explain your current automation framework project structure.
+================================================================================
+
+
+9.Explain your current automation framework project structure.
